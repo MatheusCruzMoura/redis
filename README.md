@@ -1,4 +1,9 @@
-1. Criando a rede:
+### Rodando os containeers
+	```
+	docker compose up --build -d
+	```
+
+<!-- 1. Criando a rede:
 	```
 	docker network create redis-net
 	```
@@ -18,16 +23,16 @@
 
 4. Criando os aqrquivos sentinel.conf e ligando ao master (mudar o caminho dos arquivos e o IP do master):
 	```
-	echo "sentinel monitor mymaster 172.18.0.2 6379 2" > /apps/redis/sentinel/sentinel_1/sentinel.conf
-	echo "sentinel monitor mymaster 172.18.0.2 6379 2" > /apps/redis/sentinel/sentinel_2/sentinel.conf
-	echo "sentinel monitor mymaster 172.18.0.2 6379 2" > /apps/redis/sentinel/sentinel_3/sentinel.conf
+	echo "sentinel monitor mymaster 172.18.0.2 6379 2" > ./sentinel_1/sentinel.conf
+	echo "sentinel monitor mymaster 172.18.0.2 6379 2" > ./sentinel_2/sentinel.conf
+	echo "sentinel monitor mymaster 172.18.0.2 6379 2" > ./sentinel_3/sentinel.conf
 	```
 
 5. Criando os containers das sentinels (mudar o caminho dos arquivos):
 	```
-	docker run -d --name redis-sentinel_1 -p 26379:26379 --network redis-net -v /apps/redis/sentinel/sentinel_1:/data redis redis-sentinel /data/sentinel.conf
-	docker run -d --name redis-sentinel_2 -p 26380:26379 --network redis-net -v /apps/redis/sentinel/sentinel_2:/data redis redis-sentinel /data/sentinel.conf
-	docker run -d --name redis-sentinel_3 -p 26381:26379 --network redis-net -v /apps/redis/sentinel/sentinel_3:/data redis redis-sentinel /data/sentinel.conf
+	docker run -d --name redis-sentinel_1 -p 26379:26379 --network redis-net -v ./sentinel_1:/data redis redis-sentinel /data/sentinel.conf
+	docker run -d --name redis-sentinel_2 -p 26380:26379 --network redis-net -v ./sentinel_2:/data redis redis-sentinel /data/sentinel.conf
+	docker run -d --name redis-sentinel_3 -p 26381:26379 --network redis-net -v ./sentinel_3:/data redis redis-sentinel /data/sentinel.conf
 	```
 
 6. Verificando se as sentinelas estão executando corretamente:	
@@ -41,4 +46,4 @@
 	```
 	npm install
     npm start
-	```
+	``` -->
