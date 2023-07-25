@@ -5,12 +5,16 @@ services:
     image: redis
     container_name: redis-master
     hostname: redis-master
+    restart: always
     volumes:
       - "./.data:/data"
+    expose:
+      - "6379"
     ports:
       - "6380:6379"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.2
 
   redis-commander:
     container_name: redis-commander
@@ -19,38 +23,49 @@ services:
     restart: always
     links:
       - redis-master
+    expose:
+      - "8081"
     ports:
       - "8085:8081"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.8
 
   redis-slave-1:
     image: redis
     container_name: redis-slave-1
     hostname: redis-slave-1
+    restart: always
     command: redis-server --slaveof redis-master 6379
     links:
       - redis-master
     volumes:
       - "./.data:/data"
+    expose:
+      - "6379"
     ports:
       - "6381:6379"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.3
 
   redis-slave-2:
     image: redis
     container_name: redis-slave-2
     hostname: redis-slave-2
+    restart: always
     command: redis-server --slaveof redis-master 6379
     links:
       - redis-master
     volumes:
       - "./.data:/data"
+    expose:
+      - "6379"
     ports:
       - "6382:6379"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.4
 
   # Instance 1
   redis-sentinel-1:
@@ -58,15 +73,20 @@ services:
       context: ./redis-sentinel
     container_name: redis-sentinel-1
     hostname: redis-sentinel-1
+    restart: always
     links:
       - redis-master
       - redis-slave-1
       - redis-slave-2
+    expose:
+      - "6379"
+      - "26379"
     ports:
       - "6391:6379"
       - "26381:26379"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.5
 
   # Instance 2
   redis-sentinel-2:
@@ -74,30 +94,60 @@ services:
       context: ./redis-sentinel
     container_name: redis-sentinel-2
     hostname: redis-sentinel-2
+    restart: always
     links:
       - redis-master
       - redis-slave-1
       - redis-slave-2
+    expose:
+      - "6379"
+      - "26379"
     ports:
       - "6392:6379"
       - "26382:26379"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.6
 
   redis-sentinel-3:
     build:
       context: ./redis-sentinel
     container_name: redis-sentinel-3
     hostname: redis-sentinel-3
+    restart: always
     links:
       - redis-master
       - redis-slave-1
       - redis-slave-2
+    expose:
+      - "6379"
+      - "26379"
     ports:
       - "6393:6379"
       - "26383:26379"
     networks:
-      - network1
+      network1:
+        ipv4_address: 172.20.0.7
+
+  redis-nodejs:
+    container_name: redis-nodejs
+    hostname: redis-nodejs
+    image: node
+    restart: unless-stopped
+    working_dir: /home/node/app
+    command: >
+      sh -c "npm install && npm start"
+    links:
+      - redis-master
+    volumes:
+      - ./nodejs:/home/node/app
+    expose:
+      - "3000"
+    ports:
+      - 4000:3000
+    networks:
+      network1:
+        ipv4_address: 172.20.0.9
 
 networks:
   network1:
